@@ -1,10 +1,18 @@
 # tfarmer
 
-In order to protect user privacy and data, we avoid integration with any third-party data collection tools like google analytics. The unfortunate side effect to this is that determining how active Temporal is (amount of data going through our systems, daily active user counts) is a lot harder, and not as smooth. Using `tfarmer` we can scrape our database to determine activity, without having to expose the data to third party services, and risk compromising the privacy of our users.
+`tfarmer` is a data analytics tool used to collect activity/usage information about Temporal, to better allow RTrade Technologies to develop the service, and provide better functionality, support, and usability for frequently used aspects of Temporal.
 
-Some notes about what `tfarmer` will and won't do
+## Overview
 
-## do's and donts
+In order to protect user privacy and data, we avoid integration with any third-party data collection tools like google analytics. The unfortunate side effect to this is that determining how active Temporal is (amount of data going through our systems, daily active user counts, most frequently used services, etc..) is a lot harder, and can be quite cumbersome. 
+
+Using `tfarmer` we can scrape our database to determine activity, without having to expose the data to third party services, and risk compromising the privacy of our users.
+
+Some notes about what `tfarmer` will and won't do.
+
+tl;dr: collect non-sensitive/identifying information, and email CTO+CEO on a daily basis while conducting all information gathering in our secure data center environment.
+
+## Do's and Dont's
 
 * daily active users:
   * do:
@@ -13,8 +21,8 @@ Some notes about what `tfarmer` will and won't do
     * email the number of users to the CTO+CEO
   * dont:
     * run outside of our secure data center environment
-    * send any information other than the **number** of users (this means we wont be sending information like usernames, emails, etc..)
-
+    * send any information other than the **number** of users (this means we wont be sending information like usernames, emails, etc..)  
+<br />
 * data flowing through the system:
   * do:
     * determine the most popular data injection types (file uploads, direct pinning)
