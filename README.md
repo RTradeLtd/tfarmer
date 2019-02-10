@@ -20,7 +20,7 @@ tl;dr: collect non-sensitive/identifying information, and email CTO+CEO on a dai
   * do:
     * determine daily active users based on when they last signed in
     * count the number of users to determine the number
-    * email the number of users to the CTO+CEO
+    * email the **numbers** of users to the CTO+CEO
   * dont:
     * run outside of our secure data center environment
     * send any information other than the **number** of users (this means we wont be sending information like usernames, emails, etc..)  
@@ -32,7 +32,7 @@ tl;dr: collect non-sensitive/identifying information, and email CTO+CEO on a dai
     * determine how many keys are created each day
     * determine amount of data stored by file uplods
     * determine amount of data stored by direct pinning
-    * email the numbers to the CTO+CEO
+    * email the **numbers** to the CTO+CEO
   * dont:
     * run outside of our secure data center environment
     * send any information other than the **numbers** (this means we wont be sending information like specific content hashes, specific ipns records, usernames, emails, etc...)
