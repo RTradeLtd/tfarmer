@@ -24,7 +24,6 @@ tl;dr: collect non-sensitive/identifying information, and email CTO+CEO on a dai
   * dont:
     * run outside of our secure data center environment
     * send any information other than the **number** of users (this means we wont be sending information like usernames, emails, etc..)  
-<br />
 * data flowing through the system:
   * do:
     * determine the most popular data injection types (file uploads, direct pinning)
