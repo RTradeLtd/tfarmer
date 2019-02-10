@@ -33,18 +33,16 @@ func (f *Farmer) RegisteredUsers() ([]models.User, error) {
 // FreeUsers is used to retrieve all free users
 func (f *Farmer) FreeUsers() ([]models.User, error) {
 	usages := []models.Usage{}
-	if err := f.US.DB.Model(&models.Usage{}).Find(&usages).Error; err != nil {
+	if err := f.US.DB.Where("tier = ?", models.Free).Find(&usages).Error; err != nil {
 		return nil, err
 	}
 	users := []models.User{}
 	for _, v := range usages {
-		if v.Tier == models.Free {
-			user, err := f.UM.FindByUserName(v.UserName)
-			if err != nil {
-				return nil, err
-			}
-			users = append(users, *user)
+		user, err := f.UM.FindByUserName(v.UserName)
+		if err != nil {
+			return nil, err
 		}
+		users = append(users, *user)
 	}
 	return users, nil
 }
@@ -52,18 +50,16 @@ func (f *Farmer) FreeUsers() ([]models.User, error) {
 // LightUsers is used to retrieve all light users
 func (f *Farmer) LightUsers() ([]models.User, error) {
 	usages := []models.Usage{}
-	if err := f.US.DB.Model(&models.Usage{}).Find(&usages).Error; err != nil {
+	if err := f.US.DB.Where("tier = ?", models.Light).Find(&usages).Error; err != nil {
 		return nil, err
 	}
 	users := []models.User{}
 	for _, v := range usages {
-		if v.Tier == models.Light {
-			user, err := f.UM.FindByUserName(v.UserName)
-			if err != nil {
-				return nil, err
-			}
-			users = append(users, *user)
+		user, err := f.UM.FindByUserName(v.UserName)
+		if err != nil {
+			return nil, err
 		}
+		users = append(users, *user)
 	}
 	return users, nil
 }
@@ -71,18 +67,16 @@ func (f *Farmer) LightUsers() ([]models.User, error) {
 // PlusUsers is used to retrieve all plus users
 func (f *Farmer) PlusUsers() ([]models.User, error) {
 	usages := []models.Usage{}
-	if err := f.US.DB.Model(&models.Usage{}).Find(&usages).Error; err != nil {
+	if err := f.US.DB.Where("tier = ?", models.Plus).Find(&usages).Error; err != nil {
 		return nil, err
 	}
 	users := []models.User{}
 	for _, v := range usages {
-		if v.Tier == models.Plus {
-			user, err := f.UM.FindByUserName(v.UserName)
-			if err != nil {
-				return nil, err
-			}
-			users = append(users, *user)
+		user, err := f.UM.FindByUserName(v.UserName)
+		if err != nil {
+			return nil, err
 		}
+		users = append(users, *user)
 	}
 	return users, nil
 }
