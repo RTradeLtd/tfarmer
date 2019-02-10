@@ -41,6 +41,10 @@
   name = "github.com/RTradeLtd/gorm"
   branch = "versioned"
 
+[[constraint]]
+  name = "github.com/RTradeLtd/rtfs"
+  version = "~v2.0.0"
+  
 [prune]
   go-tests = true
   unused-packages = true
