@@ -83,12 +83,34 @@ func (f *Farmer) PlusUsers() ([]models.User, error) {
 	return users, nil
 }
 
-// UsersActive24Hours is used to get all active users in the last 24 hours.
-func (f *Farmer) UsersActive24Hours() ([]models.User, error) {
+// ActiveUsers24Hours is used to get all active users in the last 24 hours.
+// this doesn't consider actual usage of the platform
+//  and is simply a login-in based metrics
+func (f *Farmer) ActiveUsers24Hours() ([]models.User, error) {
 	users := []models.User{}
 	tt := time.Now().Add(time.Hour * -24)
 	if err := f.UM.DB.Where("updated_at > ?", tt).Find(&users).Error; err != nil {
 		return nil, err
+	}
+	return users, nil
+}
+
+// ActiveUsage24Hours is used to get all active users in the last 24 hours
+// based off actual usage of the platform, and considered things like:
+// pubsub, key management, ipns, and upload usage
+func (f *Farmer) ActiveUsage24Hours() ([]models.User, error) {
+	usages := []models.Usage{}
+	tt := time.Now().Add(time.Hour * -24)
+	if err := f.US.DB.Where("updated_at > ?", tt).Find(&usages).Error; err != nil {
+		return nil, err
+	}
+	users := []models.User{}
+	for _, v := range usages {
+		user, err := f.UM.FindByUserName(v.UserName)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, *user)
 	}
 	return users, nil
 }

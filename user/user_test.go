@@ -192,7 +192,28 @@ func Test_User(t *testing.T) {
 	foundTestUser1, foundTestUser2, foundTestUser3 = false, false, false
 
 	// get active users in the last 24 hours
-	users, err = farmer.UsersActive24Hours()
+	users, err = farmer.ActiveUsers24Hours()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, v := range users {
+		if v.UserName == "testuser1" {
+			foundTestUser1 = true
+		} else if v.UserName == "testuser2" {
+			foundTestUser2 = true
+		} else if v.UserName == "testuser3" {
+			foundTestUser3 = true
+		}
+	}
+	if !foundTestUser1 || !foundTestUser2 || !foundTestUser3 {
+		t.Fatal("failed to find correct users")
+	}
+
+	// reset found variables
+	foundTestUser1, foundTestUser2, foundTestUser3 = false, false, false
+
+	// get active usage in the last 24 hours
+	users, err = farmer.ActiveUsage24Hours()
 	if err != nil {
 		t.Fatal(err)
 	}
