@@ -14,9 +14,10 @@ type Farmer struct {
 }
 
 // NewFarmer is used to instantiate our upload farmer
-func NewFarmer(db *gorm.DB) *Farmer {
+func NewFarmer(db *gorm.DB, ipfs rtfs.Manager) *Farmer {
 	return &Farmer{
-		UM: models.NewUploadManager(db),
+		UM:   models.NewUploadManager(db),
+		ipfs: ipfs,
 	}
 }
 
@@ -47,20 +48,39 @@ func (f *Farmer) TotalUploadsCount(unique bool) (int, error) {
 }
 
 // AverageUploadSize is used to get the average size of uploads
-func (f *Farmer) AverageUploadSize() (float64, error) {
+func (f *Farmer) AverageUploadSize(unique bool) (float64, error) {
 	uploads, err := f.UM.GetUploads()
 	if err != nil {
 		return 0, err
 	}
-	var totalSizeInBytes int
-	for _, v := range uploads {
-		stats, err := f.ipfs.Stat(v.Hash)
-		if err != nil {
-			return 0, err
+	var (
+		totalSizeInBytes int
+		numUploads       int
+	)
+	if unique {
+		found := make(map[string]bool)
+		for _, v := range uploads {
+			if !found[v.Hash] {
+				found[v.Hash] = true
+				stats, err := f.ipfs.Stat(v.Hash)
+				if err != nil {
+					return 0, err
+				}
+				totalSizeInBytes = totalSizeInBytes + stats.CumulativeSize
+			}
 		}
-		totalSizeInBytes = totalSizeInBytes + stats.CumulativeSize
+		numUploads = len(found)
+	} else {
+		for _, v := range uploads {
+			stats, err := f.ipfs.Stat(v.Hash)
+			if err != nil {
+				return 0, err
+			}
+			totalSizeInBytes = totalSizeInBytes + stats.CumulativeSize
+		}
+		numUploads = len(uploads)
 	}
 	totalSizeInGigaBytes := float64(totalSizeInBytes) / float64(datasize.GB.Bytes())
-	averageSizeInGigaBytes := totalSizeInGigaBytes / float64(len(uploads))
+	averageSizeInGigaBytes := totalSizeInGigaBytes / float64(numUploads)
 	return averageSizeInGigaBytes, nil
 }
