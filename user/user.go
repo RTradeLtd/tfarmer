@@ -1,6 +1,8 @@
 package user
 
 import (
+	"time"
+
 	"github.com/RTradeLtd/database/models"
 	"github.com/RTradeLtd/gorm"
 )
@@ -81,11 +83,12 @@ func (f *Farmer) PlusUsers() ([]models.User, error) {
 	return users, nil
 }
 
-/*
 // UsersActive24Hours is used to get all active users in the last 24 hours.
 func (f *Farmer) UsersActive24Hours() ([]models.User, error) {
 	users := []models.User{}
-	// db.Where("updated_at > ?", lastWeek).Find(&users)
+	tt := time.Now().Add(time.Hour * -24)
+	if err := f.UM.DB.Where("updated_at > ?", tt).Find(&users).Error; err != nil {
+		return nil, err
+	}
 	return users, nil
 }
-*/
