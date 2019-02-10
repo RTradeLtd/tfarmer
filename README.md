@@ -2,6 +2,8 @@
 
 `tfarmer` is a data analytics tool used to collect activity/usage information about Temporal, to better allow RTrade Technologies to develop the service, and provide better functionality, support, and usability for frequently used aspects of Temporal.
 
+In order to maintain transparency into our operations, and Temporal as a whole, we believe it is neccessary to also open-source the code we use to gain insight into Temporal while not having to use third-party analytics tooling.
+
 ## Overview
 
 In order to protect user privacy and data, we avoid integration with any third-party data collection tools like google analytics. The unfortunate side effect to this is that determining how active Temporal is (amount of data going through our systems, daily active user counts, most frequently used services, etc..) is a lot harder, and can be quite cumbersome. 
