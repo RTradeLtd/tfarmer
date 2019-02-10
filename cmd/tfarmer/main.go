@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/RTradeLtd/gorm"
+	"github.com/RTradeLtd/tfarmer/mail"
 	"github.com/RTradeLtd/tfarmer/user"
 
 	"github.com/RTradeLtd/cmd"
@@ -25,14 +26,14 @@ var (
 
 // command-line flags
 var (
-	devMode    *bool
-	debug      *bool
-	configPath *string
-	dbNoSSL    *bool
-	dbMigrate  *bool
-	grpcNoSSL  *bool
-	apiPort    *string
-
+	devMode        *bool
+	debug          *bool
+	configPath     *string
+	dbNoSSL        *bool
+	dbMigrate      *bool
+	sendEmail      *bool
+	emailRecipient *string
+	recipientName  *string
 	// bucket flags
 	bucketLocation *string
 )
@@ -54,13 +55,13 @@ func baseFlagSet() *flag.FlagSet {
 	dbMigrate = f.Bool("db.migrate", false,
 		"toggle whether a database migration should occur")
 
-	// grpc configuration
-	grpcNoSSL = f.Bool("grpc.no_ssl", false,
-		"toggle SSL connection with GRPC services")
-
-	// api configuration
-	apiPort = f.String("api.port", "6767",
-		"set port to expose API on")
+	// email flags
+	sendEmail = f.Bool("email-enabled", false,
+		"used to activate email notification")
+	emailRecipient = f.String("email-recipient", "",
+		"email to send metrics to")
+	recipientName = f.String("recipient-name", "",
+		"email recipient name")
 
 	return f
 }
@@ -97,9 +98,28 @@ var commands = map[string]cmd.Cmd{
 					users, err := uf.RegisteredUsers()
 					if err != nil {
 						fmt.Println("failed to get registered users", err.Error())
+						os.Exit(1)
 					}
 					numberOfUsers := len(users)
-					fmt.Printf("there are %v total registered users", numberOfUsers)
+					msg := fmt.Sprintf("there are %v total registered users", numberOfUsers)
+					fmt.Println(msg)
+					if *sendEmail {
+						mm, err := mail.NewManager(&cfg, db.DB)
+						if err != nil {
+							fmt.Println("failed to initialize mail manager", err.Error())
+							os.Exit(1)
+						}
+						if _, err := mm.SendEmail(
+							"registered users report",
+							msg,
+							"text/html",
+							*recipientName,
+							*emailRecipient,
+						); err != nil {
+							fmt.Println("failed to send email report", err.Error())
+							os.Exit(1)
+						}
+					}
 				},
 			},
 		},
