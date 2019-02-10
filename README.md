@@ -1,4 +1,4 @@
-# tfarmer
+# tfarmer (wip)
 
 `tfarmer` is a data analytics tool used to collect activity/usage information about Temporal, to better allow RTrade Technologies to develop the service, and provide better functionality, support, and usability for frequently used aspects of Temporal.
 
@@ -6,7 +6,7 @@ In order to maintain transparency into our operations, and Temporal as a whole, 
 
 ## Overview
 
-In order to protect user privacy and data, we avoid integration with any third-party data collection tools like google analytics. The unfortunate side effect to this is that determining how active Temporal is (amount of data going through our systems, daily active user counts, most frequently used services, etc..) is a lot harder, and can be quite cumbersome. 
+In order to protect user privacy and data, we avoid integration with any third-party data collection tools like google analytics. The unfortunate side effect to this is that determining how active Temporal is (amount of data going through our systems, daily active user counts, most frequently used services, etc..) is a lot harder, and can be quite cumbersome.
 
 Using `tfarmer` we can scrape our database to determine activity, without having to expose the data to third party services, and risk compromising the privacy of our users.
 
@@ -37,3 +37,12 @@ tl;dr: collect non-sensitive/identifying information, and email CTO+CEO on a dai
   * dont:
     * run outside of our secure data center environment
     * send any information other than the **numbers** (this means we wont be sending information like specific content hashes, specific ipns records, usernames, emails, etc...)
+
+## TODO
+
+* Store this information in a database so we can generate some sick graphs
+
+## Ideas
+
+* Implement AI so we can graph/determine based off past trends what future use would look like
+* use stuff like [uber/aresdb](https://github.com/uber/aresdb)
