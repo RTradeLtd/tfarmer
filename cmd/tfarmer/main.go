@@ -5,9 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/RTradeLtd/gorm"
+	"github.com/RTradeLtd/rtfs"
 	"github.com/RTradeLtd/tfarmer/mail"
+	"github.com/RTradeLtd/tfarmer/upload"
 	"github.com/RTradeLtd/tfarmer/user"
 
 	"github.com/RTradeLtd/cmd"
@@ -34,6 +37,7 @@ var (
 	sendEmail      *bool
 	emailRecipient *string
 	recipientName  *string
+	uploadType     *string
 	// bucket flags
 	bucketLocation *string
 )
@@ -48,6 +52,8 @@ func baseFlagSet() *flag.FlagSet {
 		"toggle debug mode")
 	configPath = f.String("config", os.Getenv("CONFIG_DAG"),
 		"path to Temporal configuration")
+	uploadType = f.String("upload-type", "file",
+		"type of uploads to query against")
 
 	// db configuration
 	dbNoSSL = f.Bool("db.no_ssl", false,
@@ -231,6 +237,60 @@ var commands = map[string]cmd.Cmd{
 						}
 						if _, err := mm.SendEmail(
 							"plus users report",
+							msg,
+							"text/html",
+							*recipientName,
+							*emailRecipient,
+						); err != nil {
+							fmt.Println("failed to send email report", err.Error())
+							os.Exit(1)
+						}
+					}
+				},
+			},
+		},
+	},
+	"upload": {
+		Blurb:         "Upload based metrics",
+		Description:   "Allows for gathering of upload based metrics (number of uploads, type, etc...)",
+		ChildRequired: true,
+		Children: map[string]cmd.Cmd{
+			"count": {
+				Blurb:       "Upload count",
+				Description: "Gets the total number of uploads",
+				Action: func(cfg config.TemporalConfig, args map[string]string) {
+					db, err := database.Initialize(&cfg, database.Options{
+						SSLModeDisable: *dbNoSSL,
+						RunMigrations:  *dbMigrate,
+					})
+					if err != nil {
+						fmt.Println("failed to initialize database connection", err.Error())
+						os.Exit(1)
+					}
+					ipfs, err := rtfs.NewManager(
+						cfg.IPFS.APIConnection.Host+":"+cfg.IPFS.APIConnection.Port,
+						"", 1*time.Minute,
+					)
+					if err != nil {
+						fmt.Println("failed to open ipfs api connection", err.Error())
+						os.Exit(1)
+					}
+					uf := upload.NewFarmer(db.DB, ipfs)
+					num, err := uf.NumberOfUploads(*uploadType)
+					if err != nil {
+						fmt.Println("failed to get number of uploads", err.Error())
+						os.Exit(1)
+					}
+					msg := fmt.Sprintf("there are %v total %s uploads", num, *uploadType)
+					fmt.Println(msg)
+					if *sendEmail {
+						mm, err := mail.NewManager(&cfg, db.DB)
+						if err != nil {
+							fmt.Println("failed to initialize mail manager", err.Error())
+							os.Exit(1)
+						}
+						if _, err := mm.SendEmail(
+							"registered users report",
 							msg,
 							"text/html",
 							*recipientName,
