@@ -122,6 +122,126 @@ var commands = map[string]cmd.Cmd{
 					}
 				},
 			},
+			"free": {
+				Blurb:       "Free users",
+				Description: "Used to get the number of free users",
+				Action: func(cfg config.TemporalConfig, args map[string]string) {
+					db, err := database.Initialize(&cfg, database.Options{
+						SSLModeDisable: *dbNoSSL,
+						RunMigrations:  *dbMigrate,
+					})
+					if err != nil {
+						fmt.Println("failed to initialize database connection", err.Error())
+						os.Exit(1)
+					}
+					uf := user.NewFarmer(db.DB)
+					users, err := uf.FreeUsers()
+					if err != nil {
+						fmt.Println("failed to get free users", err.Error())
+						os.Exit(1)
+					}
+					numberOfUsers := len(users)
+					msg := fmt.Sprintf("there are %v total free users", numberOfUsers)
+					fmt.Println(msg)
+					if *sendEmail {
+						mm, err := mail.NewManager(&cfg, db.DB)
+						if err != nil {
+							fmt.Println("failed to initialize mail manager", err.Error())
+							os.Exit(1)
+						}
+						if _, err := mm.SendEmail(
+							"free users report",
+							msg,
+							"text/html",
+							*recipientName,
+							*emailRecipient,
+						); err != nil {
+							fmt.Println("failed to send email report", err.Error())
+							os.Exit(1)
+						}
+					}
+				},
+			},
+			"light": {
+				Blurb:       "Light users",
+				Description: "Used to get the number of light users",
+				Action: func(cfg config.TemporalConfig, args map[string]string) {
+					db, err := database.Initialize(&cfg, database.Options{
+						SSLModeDisable: *dbNoSSL,
+						RunMigrations:  *dbMigrate,
+					})
+					if err != nil {
+						fmt.Println("failed to initialize database connection", err.Error())
+						os.Exit(1)
+					}
+					uf := user.NewFarmer(db.DB)
+					users, err := uf.LightUsers()
+					if err != nil {
+						fmt.Println("failed to get light users", err.Error())
+						os.Exit(1)
+					}
+					numberOfUsers := len(users)
+					msg := fmt.Sprintf("there are %v total light users", numberOfUsers)
+					fmt.Println(msg)
+					if *sendEmail {
+						mm, err := mail.NewManager(&cfg, db.DB)
+						if err != nil {
+							fmt.Println("failed to initialize mail manager", err.Error())
+							os.Exit(1)
+						}
+						if _, err := mm.SendEmail(
+							"light users report",
+							msg,
+							"text/html",
+							*recipientName,
+							*emailRecipient,
+						); err != nil {
+							fmt.Println("failed to send email report", err.Error())
+							os.Exit(1)
+						}
+					}
+				},
+			},
+			"plus": {
+				Blurb:       "Plus users",
+				Description: "Used to get the number of plus users",
+				Action: func(cfg config.TemporalConfig, args map[string]string) {
+					db, err := database.Initialize(&cfg, database.Options{
+						SSLModeDisable: *dbNoSSL,
+						RunMigrations:  *dbMigrate,
+					})
+					if err != nil {
+						fmt.Println("failed to initialize database connection", err.Error())
+						os.Exit(1)
+					}
+					uf := user.NewFarmer(db.DB)
+					users, err := uf.FreeUsers()
+					if err != nil {
+						fmt.Println("failed to get plus users", err.Error())
+						os.Exit(1)
+					}
+					numberOfUsers := len(users)
+					msg := fmt.Sprintf("there are %v total plus users", numberOfUsers)
+					fmt.Println(msg)
+					if *sendEmail {
+						mm, err := mail.NewManager(&cfg, db.DB)
+						if err != nil {
+							fmt.Println("failed to initialize mail manager", err.Error())
+							os.Exit(1)
+						}
+						if _, err := mm.SendEmail(
+							"plus users report",
+							msg,
+							"text/html",
+							*recipientName,
+							*emailRecipient,
+						); err != nil {
+							fmt.Println("failed to send email report", err.Error())
+							os.Exit(1)
+						}
+					}
+				},
+			},
 		},
 	},
 }

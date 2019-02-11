@@ -52,7 +52,7 @@ func TestUpload(t *testing.T) {
 	farmer := NewFarmer(db, ipfs)
 	// fake upload1
 	upload1, err := farmer.UM.NewUpload(
-		testCID, "pin", models.UploadOptions{
+		testCID, "file", models.UploadOptions{
 			NetworkName:      "public",
 			Username:         "testuser1",
 			HoldTimeInMonths: 5,
@@ -104,6 +104,16 @@ func TestUpload(t *testing.T) {
 	}
 	if size != expectedUniqueSize {
 		t.Fatal("Failed to calculate correct unique average size")
+	}
+	if num, err := farmer.NumberOfUploads("file"); err != nil {
+		t.Fatal(err)
+	} else if num != 1 {
+		t.Fatal("failed to find correct upload count")
+	}
+	if num, err := farmer.NumberOfUploads("pin"); err != nil {
+		t.Fatal(err)
+	} else if num != 1 {
+		t.Fatal("failed to find correct upload count")
 	}
 }
 
