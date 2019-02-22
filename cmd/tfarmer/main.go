@@ -343,7 +343,7 @@ var commands = map[string]cmd.Cmd{
 							fmt.Println("failed to initialize mail manager", err.Error())
 							os.Exit(1)
 						}
-						if _, err := mm.SendEmail(
+						if resp, err := mm.SendEmail(
 							"registered users report",
 							msg,
 							"text/html",
@@ -352,6 +352,8 @@ var commands = map[string]cmd.Cmd{
 						); err != nil {
 							fmt.Println("failed to send email report", err.Error())
 							os.Exit(1)
+						} else {
+							fmt.Printf("resposne from sengrid\n+%v\n", resp)
 						}
 					}
 				},

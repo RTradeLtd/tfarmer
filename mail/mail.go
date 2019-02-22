@@ -62,7 +62,7 @@ func (mm *Manager) BulkSend(subject, content, contentType string, recipientNames
 }
 
 // SendEmail is used to send an email to temporal users
-func (mm *Manager) SendEmail(subject, content, contentType, recipientName, recipientEmail string) (int, error) {
+func (mm *Manager) SendEmail(subject, content, contentType, recipientName, recipientEmail string) (*rest.Response, error) {
 	mm.cmux.Lock()
 	if contentType == "" {
 		contentType = "text/html"
@@ -77,7 +77,7 @@ func (mm *Manager) SendEmail(subject, content, contentType, recipientName, recip
 	response, err := mm.client.Send(mail.NewV3MailInit(from, subject, to, message))
 	mm.cmux.Unlock()
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
-	return response.StatusCode, nil
+	return response, nil
 }
