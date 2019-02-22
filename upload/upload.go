@@ -86,9 +86,9 @@ func (f *Farmer) AverageUploadSize(unique bool) (float64, error) {
 }
 
 // NumberOfUploads is used to retrieve number of uploads by type
-func (f *Farmer) NumberOfUploads(uploadType string) (int, error) {
+func (f *Farmer) NumberOfUploads() (int, error) {
 	uploads := []models.Upload{}
-	if err := f.UM.DB.Where("type = ?", uploadType).Find(&uploads).Error; err != nil {
+	if err := f.UM.DB.Find(&uploads).Error; err != nil {
 		return 0, err
 	}
 	return len(uploads), nil

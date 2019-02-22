@@ -105,14 +105,9 @@ func TestUpload(t *testing.T) {
 	if size != expectedUniqueSize {
 		t.Fatal("Failed to calculate correct unique average size")
 	}
-	if num, err := farmer.NumberOfUploads("file"); err != nil {
+	if num, err := farmer.NumberOfUploads(); err != nil {
 		t.Fatal(err)
-	} else if num != 1 {
-		t.Fatal("failed to find correct upload count")
-	}
-	if num, err := farmer.NumberOfUploads("pin"); err != nil {
-		t.Fatal(err)
-	} else if num != 1 {
+	} else if num == 0 {
 		t.Fatal("failed to find correct upload count")
 	}
 }

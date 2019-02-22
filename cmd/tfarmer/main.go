@@ -38,6 +38,7 @@ var (
 	emailRecipient *string
 	recipientName  *string
 	uploadType     *string
+	unique         *bool
 	// bucket flags
 	bucketLocation *string
 )
@@ -52,8 +53,8 @@ func baseFlagSet() *flag.FlagSet {
 		"toggle debug mode")
 	configPath = f.String("config", os.Getenv("CONFIG_DAG"),
 		"path to Temporal configuration")
-	uploadType = f.String("upload-type", "file",
-		"type of uploads to query against")
+	unique = f.Bool("unique", false,
+		"toggle whether unique checks should be performed")
 
 	// db configuration
 	dbNoSSL = f.Bool("db.no_ssl", false,
@@ -276,12 +277,65 @@ var commands = map[string]cmd.Cmd{
 						os.Exit(1)
 					}
 					uf := upload.NewFarmer(db.DB, ipfs)
-					num, err := uf.NumberOfUploads(*uploadType)
+					num, err := uf.NumberOfUploads()
 					if err != nil {
 						fmt.Println("failed to get number of uploads", err.Error())
 						os.Exit(1)
 					}
-					msg := fmt.Sprintf("there are %v total %s uploads", num, *uploadType)
+					msg := fmt.Sprintf("there are %v total uploads", num)
+					fmt.Println(msg)
+					if *sendEmail {
+						mm, err := mail.NewManager(&cfg, db.DB)
+						if err != nil {
+							fmt.Println("failed to initialize mail manager", err.Error())
+							os.Exit(1)
+						}
+						if _, err := mm.SendEmail(
+							"registered users report",
+							msg,
+							"text/html",
+							*recipientName,
+							*emailRecipient,
+						); err != nil {
+							fmt.Println("failed to send email report", err.Error())
+							os.Exit(1)
+						}
+					}
+				},
+			},
+			"size": {
+				Blurb:       "Upload Size Average",
+				Description: "Gets the average size of uploads",
+				Action: func(cfg config.TemporalConfig, args map[string]string) {
+					db, err := database.Initialize(&cfg, database.Options{
+						SSLModeDisable: *dbNoSSL,
+						RunMigrations:  *dbMigrate,
+					})
+					if err != nil {
+						fmt.Println("failed to initialize database connection", err.Error())
+						os.Exit(1)
+					}
+					ipfs, err := rtfs.NewManager(
+						cfg.IPFS.APIConnection.Host+":"+cfg.IPFS.APIConnection.Port,
+						"", 1*time.Minute,
+					)
+					if err != nil {
+						fmt.Println("failed to open ipfs api connection", err.Error())
+						os.Exit(1)
+					}
+					uf := upload.NewFarmer(db.DB, ipfs)
+					size, err := uf.AverageUploadSize(*unique)
+					if err != nil {
+						fmt.Println("failed to get upload size average", err.Error())
+						os.Exit(1)
+					}
+					var uniqueMessage string
+					if *unique {
+						uniqueMessage = "unique"
+					} else {
+						uniqueMessage = "non unique"
+					}
+					msg := fmt.Sprintf("the %s average size of uploads is %v gigabytes", uniqueMessage, size)
 					fmt.Println(msg)
 					if *sendEmail {
 						mm, err := mail.NewManager(&cfg, db.DB)
