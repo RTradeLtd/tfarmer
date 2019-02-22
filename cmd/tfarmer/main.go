@@ -291,7 +291,7 @@ var commands = map[string]cmd.Cmd{
 							os.Exit(1)
 						}
 						if _, err := mm.SendEmail(
-							"registered users report",
+							"upload count report",
 							msg,
 							"text/html",
 							*recipientName,
@@ -344,7 +344,7 @@ var commands = map[string]cmd.Cmd{
 							os.Exit(1)
 						}
 						if resp, err := mm.SendEmail(
-							"registered users report",
+							"upload size report",
 							msg,
 							"text/html",
 							*recipientName,
