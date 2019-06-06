@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/RTradeLtd/config"
-	"github.com/RTradeLtd/database/models"
-	"github.com/RTradeLtd/gorm"
+	"github.com/RTradeLtd/config/v2"
+	"github.com/RTradeLtd/database/v2/models"
+	"github.com/jinzhu/gorm"
 )
 
 func TestMigration(t *testing.T) {
@@ -67,7 +67,7 @@ func Test_User(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := farmer.US.UpdateTier(user2.UserName, models.Light); err != nil {
+	if err := farmer.US.UpdateTier(user2.UserName, models.Paid); err != nil {
 		t.Fatal(err)
 	}
 	usage2, err := farmer.US.FindByUserName("testuser2")
@@ -88,7 +88,7 @@ func Test_User(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := farmer.US.UpdateTier(user3.UserName, models.Plus); err != nil {
+	if err := farmer.US.UpdateTier(user3.UserName, models.Paid); err != nil {
 		t.Fatal(err)
 	}
 	usage3, err := farmer.US.FindByUserName("testuser3")
@@ -148,8 +148,8 @@ func Test_User(t *testing.T) {
 		t.Fatal("failed to find testuser1 from free tier search")
 	}
 
-	// find light users
-	users, err = farmer.LightUsers()
+	// find paid users
+	users, err = farmer.PaidUsers()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -159,33 +159,21 @@ func Test_User(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if usage.UserName == "testuser2" && usage.Tier == models.Light {
+			if usage.UserName == "testuser2" && usage.Tier == models.Paid {
 				foundTestUser2 = true
 			}
-		}
-	}
-	if !foundTestUser2 {
-		t.Fatal("failed to find testuser2 from light tier search")
-	}
-
-	// find plus users
-	users, err = farmer.PlusUsers()
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, v := range users {
-		if v.UserName == "testuser3" {
+		} else if v.UserName == "testuser3" {
 			usage, err := farmer.US.FindByUserName(v.UserName)
 			if err != nil {
 				t.Fatal(err)
 			}
-			if usage.UserName == "testuser3" && usage.Tier == models.Plus {
+			if usage.UserName == "testuser3" && usage.Tier == models.Paid {
 				foundTestUser3 = true
 			}
 		}
 	}
-	if !foundTestUser3 {
-		t.Fatal("failed to find testuser3 from plus tier search")
+	if !foundTestUser2 || !foundTestUser3 {
+		t.Fatal("failed to find testuser2from paid tier search")
 	}
 
 	// reset found variables
