@@ -168,12 +168,12 @@ func Test_User(t *testing.T) {
 				t.Fatal(err)
 			}
 			if usage.UserName == "testuser3" && usage.Tier == models.Paid {
-				foundTestUser2 = true
+				foundTestUser3 = true
 			}
 		}
 	}
 	if !foundTestUser2 || !foundTestUser3 {
-		t.Fatal("failed to find testuser2 and testuser3 from paid tier search")
+		t.Fatal("failed to find testuser2from paid tier search")
 	}
 
 	// reset found variables
