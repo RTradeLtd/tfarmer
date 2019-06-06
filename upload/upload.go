@@ -1,10 +1,10 @@
 package upload
 
 import (
-	"github.com/RTradeLtd/database/models"
-	"github.com/RTradeLtd/gorm"
-	"github.com/RTradeLtd/rtfs"
+	"github.com/RTradeLtd/database/v2/models"
+	"github.com/RTradeLtd/rtfs/v2"
 	"github.com/c2h5oh/datasize"
+	"github.com/jinzhu/gorm"
 )
 
 // Farmer is used to gather upload information

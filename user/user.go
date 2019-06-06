@@ -3,8 +3,8 @@ package user
 import (
 	"time"
 
-	"github.com/RTradeLtd/database/models"
-	"github.com/RTradeLtd/gorm"
+	"github.com/RTradeLtd/database/v2/models"
+	"github.com/jinzhu/gorm"
 )
 
 // used to scrape user related data
@@ -49,27 +49,10 @@ func (f *Farmer) FreeUsers() ([]models.User, error) {
 	return users, nil
 }
 
-// LightUsers is used to retrieve all light users
-func (f *Farmer) LightUsers() ([]models.User, error) {
+// PaidUsers is used to retrieve all paid users
+func (f *Farmer) PaidUsers() ([]models.User, error) {
 	usages := []models.Usage{}
-	if err := f.US.DB.Where("tier = ?", models.Light).Find(&usages).Error; err != nil {
-		return nil, err
-	}
-	users := []models.User{}
-	for _, v := range usages {
-		user, err := f.UM.FindByUserName(v.UserName)
-		if err != nil {
-			return nil, err
-		}
-		users = append(users, *user)
-	}
-	return users, nil
-}
-
-// PlusUsers is used to retrieve all plus users
-func (f *Farmer) PlusUsers() ([]models.User, error) {
-	usages := []models.Usage{}
-	if err := f.US.DB.Where("tier = ?", models.Plus).Find(&usages).Error; err != nil {
+	if err := f.US.DB.Where("tier = ?", models.Paid).Find(&usages).Error; err != nil {
 		return nil, err
 	}
 	users := []models.User{}

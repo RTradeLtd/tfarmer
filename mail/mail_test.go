@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/RTradeLtd/config"
-	"github.com/RTradeLtd/database"
+	"github.com/RTradeLtd/config/v2"
 	"github.com/RTradeLtd/tfarmer/mail"
+	"github.com/jinzhu/gorm"
 )
 
 var (
@@ -23,13 +23,7 @@ func TestMail(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	db, err := database.OpenDBConnection(database.DBOptions{
-		User:           cfg.Database.Username,
-		Password:       cfg.Database.Password,
-		Address:        cfg.Database.URL,
-		Port:           cfg.Database.Port,
-		SSLModeDisable: true,
-	})
+	db, err := openDatabaseConnection(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,4 +64,11 @@ func TestMail(t *testing.T) {
 	); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func openDatabaseConnection(cfg *config.TemporalConfig) (*gorm.DB, error) {
+	dbConnURL := fmt.Sprintf("host=127.0.0.1 port=%s user=postgres dbname=temporal password=%s sslmode=disable",
+		cfg.Database.Port, cfg.Database.Password)
+
+	return gorm.Open("postgres", dbConnURL)
 }
